@@ -1,0 +1,498 @@
+//SAMPLE CODE
+
+#include<pic.h>
+#define LCD PORTD
+#define EN RE0
+#define RW RE1
+#define RS RE2
+
+void delay(int count)
+	{
+		while(count--);
+	}
+	
+void pulse()
+	{
+		EN=1;
+		delay(1000);
+		EN=0;
+		delay(1000);
+	}
+	
+void type()
+	{
+		RW=0;
+		RS=0;
+		LCD=0X38;
+		pulse();
+	}
+	
+void on()
+	{
+		RW=0;
+		RS=0;
+		LCD=0X0E;
+		pulse();
+	}
+	
+void address(int cursor)
+	{
+		RW=0;
+		RS=0;
+		LCD=cursor;
+		pulse();
+	}
+	
+void data(char value)
+	{
+		RW=0;
+		RS=1;
+		LCD=value;
+		pulse();
+	}
+	
+void display(char *string)
+	{
+	while(*string)
+		{
+			RS=1;
+			RW=0;
+			LCD=*string;
+			string++;
+			pulse();
+		}
+	}
+	
+
+void transmiter(char *TX)
+	{
+		while(*TX)
+		{
+			address(0X80);
+			data(*TX);
+			TXREG=*TX;
+			*TX++;
+			while(TXIF==0);
+			TXIF=0;
+		}
+	}
+	
+void receiver()
+	{
+		while(RCIF==0);
+		int RX=RCREG;
+		address(0XC0);
+		data(RX);
+		RCIF=0;
+	}
+	
+void main()
+{
+	TRISA=0XFF;
+	PORTA=0X00;
+	TRISB=0X00;
+	PORTB=0X00;
+	TRISC=0X80;
+	PORTC=0X00;
+	TRISD=0X00;
+	PORTD=0X00;
+	TRISE=0X00;
+	PORTE=0X00;
+	ANSEL=0X00;
+	ANSELH=0X00;
+	TXSTA=0X26;
+	RCSTA=0X90;
+	SPBRG=25;
+	type();
+	on();
+	while(1)
+	{
+		address(0xc0);
+		display("ROHITH");
+		transmiter("ROHITH");
+		receiver();
+	}
+}
+
+//LOGIN USING UART 
+
+#include <pic.h>
+#define LCD PORTD
+#define EN RE0
+#define RW RE1
+#define RS RE2
+int array[10]={0x06,0x5B,0xFD,0x4F};
+int array1[10]={0x07,0x7F,0x6F};
+char num[6],num2[6];
+
+void delay(int count) 
+{
+    while (count--);
+}
+
+void pulse()
+{
+    EN = 1;
+    delay(1000);
+    EN = 0;
+    delay(1000);
+}
+
+void type() 
+{
+    RW = 0;
+    RS = 0;
+    LCD = 0x38;
+    pulse();
+}
+
+void on() 
+{
+    RW = 0;
+    RS = 0;
+    LCD = 0x0E;
+    pulse();
+}
+
+void address(int cursor) 
+{
+    RW = 0;
+    RS = 0;
+    LCD = cursor;
+    pulse();
+}
+
+void data(char value) 
+{
+    RW = 0;
+    RS = 1;
+    LCD = value;
+    pulse();
+}
+
+void display(char *string) 
+{
+    while (*string) 
+	{
+        RS = 1;
+        RW = 0;
+        LCD = *string;
+        string++;
+        pulse();
+    }
+}
+
+void transmiter(char TX) 
+{
+    address(0x80);
+    data(TX);
+    TXREG = TX;
+    while (TXIF == 0);
+    TXIF = 0;
+}
+
+void transmiterString(char *str) 
+{
+    while (*str) 
+	{
+        transmiter(*str);
+        str++;
+    }
+}
+
+void show(char *result) 
+{
+    while (*result) 
+	{
+        RS = 1;
+        RW = 0;
+        LCD = *result;
+        result++;
+        pulse();
+    }
+}
+
+void show2(char *result2)
+{
+	while(*result2)
+	{
+		RS=1;
+		RW=0;
+		LCD=*result2;
+		result2++;
+		pulse();
+	}
+}
+
+void show3(char *result3)
+{
+	while(*result3)
+	{
+		RS=1;
+		RW=0;
+		LCD=*result3;
+		result3++;
+		pulse();
+	}
+}	
+void show4(char *result4)
+{
+	while(*result4)
+	{
+		RS=1;
+		RW=0;
+		LCD=*result4;
+		result4++;
+		pulse();
+	}
+}
+
+
+void main() 
+{
+    TRISA = 0x00;
+    PORTA = 0x00;
+    TRISB = 0xFF;
+    PORTB = 0x00;
+    TRISC = 0x80;
+    PORTC = 0x00;
+    TRISD = 0x00;
+    PORTD = 0x00;
+    TRISE = 0x00;
+    PORTE = 0x00;
+    ANSEL = 0x00;
+    ANSELH =0x00;
+    TXSTA = 0x26;
+    RCSTA = 0x90;
+    SPBRG = 25;
+    address(0x80);
+    display("ENTER_USERNAME");
+    address(0xC0);
+    transmiterString("ENTER_USERNAME");
+    type();
+    on();
+
+    while (1) 
+	{
+        address(0xC0);
+        display("ROHITH");
+        for (int i = 0; i <= 3;) 
+	    {
+            RA0 = 1;
+            RA1 = 0;
+            RA2 = 0;
+            RA3 = 0;
+
+            if (RB0 == 1) 
+	        {
+                transmiter('1');
+                num[i]='1';
+                while (RB0 == 1);
+                i++;
+            }
+
+            if (RB1 == 1) 
+	        {
+                transmiter('2');
+                num[i]='2';
+                while (RB1 == 1);
+                i++;
+            }
+
+            if (RB2 == 1) 
+	        {
+                transmiter('3');
+                num[i]='3';
+                while (RB2 == 1);
+                i++;
+            }
+
+            RA0 = 0;
+            RA1 = 1;
+            RA2 = 0;
+            RA3 = 0;
+
+            if (RB0 == 1) 
+	        {
+                transmiter('4');
+                num[i]='4';
+                while (RB0 == 1);
+                i++;
+            }
+
+            if (RB1 == 1) 
+	        {
+                transmiter('5');
+                num[i]='5';
+                while (RB1 == 1);
+                i++;
+            }
+
+            if (RB2 == 1) {
+                transmiter('6');
+                num[i]='6';
+                while (RB2 == 1);
+                i++;
+            }
+
+            RA0 = 0;
+            RA1 = 0;
+            RA2 = 1;
+            RA3 = 0;
+
+            if (RB0 == 1) 
+	        {
+                transmiter('7');
+                num[i]='7';
+                while (RB0 == 1);
+                i++;
+            }
+
+            if (RB1 == 1) 
+	        {
+                transmiter('8');
+                num[i]='8';
+                while (RB1 == 1);
+                i++;
+            }
+
+            if (RB2 == 1) 
+	        {
+                transmiter('9');
+                num[i]='9';
+                while (RB2 == 1);
+                i++;
+            }
+
+            RA0 = 0;
+            RA1 = 0;
+            RA2 = 0;
+            RA3 = 1;
+
+            if (RB0 == 1) 
+	        {
+                if (num[0] == '1'&& num[1] =='2' && num[2] == '3' && num[3] == '6') 
+	            {
+                    address(0x01);
+                    address(0x80);
+                    show("ENTER_PASS");
+                    transmiterString("ENTER_PASS");
+                } 
+                else 
+	            {
+                    address(0x01);
+                    address(0xC0);
+                    show2("WRONG_ID");
+                    transmiterString("WRONG_ID");
+                }
+                while(RB0==1);
+            }
+
+            if (RB2 == 1) 
+	        {
+                if (num2[0] == '1' && num2[1] == '2' && num2[2] == '3') 
+	            {
+                    address(0x80);
+                    show3("LOGGED_IN");
+                    transmiterString("LOGGED_IN");
+                } 
+                else 
+	            {
+                    address(0xC0);
+                    show4("TERMINATED");
+                    transmiterString("TERMINATED");
+                }
+                while(RB2==1);
+            }
+        }
+    }
+}
+
+
+//LOGIN ONLY SYSTEM KEYS WITHOUT LCD
+
+
+#include<pic.h>
+#include<string.h>
+
+char username[5];
+char password[4]; 
+
+void delay(int count) 
+{
+    while(count--);
+}
+
+void transmitter(char TX)
+{
+    TXREG=TX;
+    while(TXIF==0);
+    TXIF=0;
+}
+
+char receiver() 
+{
+    while(RCIF==0);
+    char RX=RCREG;
+    RCIF=0;
+    return RX;
+}
+
+int login(char *username, char *password)
+{
+    if(strcmp(username,"1163")==0&&strcmp(password,"123")==0) 
+    {
+        return 1; 
+    } 
+    else 
+    {
+        return 0; 
+    }
+}
+
+void transmiterString(char *str) 
+{
+    while(*str) 
+	{
+        transmitter(*str);
+        str++;
+    }
+}
+
+void main() 
+{
+    TRISC=0x80;
+    PORTC=0x00;
+    ANSEL=0x00;
+    ANSELH=0x00;
+    TXSTA=0x24; 
+    RCSTA=0x90;
+    SPBRG=25;
+    
+
+    while(1)
+    {
+        transmiterString("Enter username:");
+        for(int i=0;i<4;i++) 
+        {
+            username[i]=receiver();
+            transmitter(username[i]);
+        }
+
+        transmiterString("Enter password:");
+        for(int i=0;i<3;i++) 
+        {
+            password[i]=receiver();
+            transmitter(password[i]);
+        }
+
+        if(login(username, password)) 
+        {
+            transmiterString("Login successful");
+        } 
+        else
+        {
+            transmiterString("Login failed");
+        }    
+    }
+}
